@@ -66,9 +66,9 @@ chmod +x pocfinder
 ./pocfinder
 
 # Search directly using a keyword or CVE
-./pocf CVE-2024
-./pocf sqlmap
-./pocf "remote code execution"
+./pocfinder CVE-2024
+./pocfinder sqlmap
+./pocfinder "remote code execution"
 ```
 
 ### Available Commands
