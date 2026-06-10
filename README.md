@@ -49,10 +49,10 @@ git clone https://github.com/shinthink/pocfinder.git
 cd pocfinder
 
 # Make the script executable
-chmod +x pocf
+chmod +x pocfinder
 
 # Run PoCFinder
-./pocf
+./pocfinder
 ```
 
 ---
@@ -63,7 +63,7 @@ chmod +x pocf
 
 ```bash
 # Run in interactive mode
-./pocf
+./pocfinder
 
 # Search directly using a keyword or CVE
 ./pocf CVE-2024
@@ -75,16 +75,16 @@ chmod +x pocf
 
 | Command                    | Description                                      |
 |---------------------------|--------------------------------------------------|
-| `./pocf`                  | Run interactive mode                             |
-| `./pocf <keyword>`        | Search directly with keyword or CVE              |
-| `./pocf refresh`          | Clear cache and fetch fresh data                 |
-| `./pocf refresh <keyword>`| Refresh cache for specific keyword               |
+| `./pocfinder`                  | Run interactive mode                             |
+| `./pocfinder <keyword>`        | Search directly with keyword or CVE              |
+| `./pocfinder refresh`          | Clear cache and fetch fresh data                 |
+| `./pocfinder refresh <keyword>`| Refresh cache for specific keyword               |
 
 ### How to Use (Step by Step)
 
 1. **Run the tool**
    ```bash
-   ./pocf
+   ./pocfinder
    ```
 
 2. **Enter a keyword or CVE ID** when prompted (or pass it directly as argument).
@@ -109,7 +109,7 @@ chmod +x pocf
 ### Example
 
 ```bash
-./pocf CVE-2024
+./pocfinder CVE-2024
 ```
 
 This will search for repositories related to CVE-2024 and display them with rich information on the right side.
@@ -120,7 +120,7 @@ This will search for repositories related to CVE-2024 and display them with rich
 
 ```
 pocfinder/
-├── pocf              # Main executable script
+├── pocfinder              # Main executable script
 ├── README.md
 └── LICENSE
 ```
