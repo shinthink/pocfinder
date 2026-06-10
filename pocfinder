@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+# PoCFinder v2.9
+
+VERSION="2.9"
+CACHE_DIR="$HOME/.pocfinder"
+CACHE_TTL=600
+
+CYAN='\033[38;5;51m'
+YELLOW='\033[38;5;226m'
+GREEN='\033[38;5;46m'
+RED='\033[38;5;196m'
+GRAY='\033[38;5;245m'
+WHITE='\033[1;97m'
+NC='\033[0m'
+
+mkdir -p "$CACHE_DIR"
+
+banner() {
+    clear
+    echo -e "${WHITE}"
+    cat <<'EOF'
+    ____  ____  _________________   ______  __________
+   / __ \/ __ \/ ____/ ____/  _/ | / / __ \/ ____/ __ \
+  / /_/ / / / / /   / /_   / //  |/ / / / / __/ / /_/ /
+ / ____/ /_/ / /___/ __/ _/ // /|  / /_/ / /___/ _, _/
+/_/    \____/\____/_/   /___/_/ |_/_____/_____/_/ |_|
+
+EOF
+    echo -e "${NC}"
+    echo -e "${WHITE}                    PoCFinder v${VERSION}${NC}"
+    echo -e "${WHITE}                         shinthink${NC}"
+    echo
+}
+
+need() {
+    command -v "$1" >/dev/null 2>&1 || { echo "Missing dependency: $1"; exit 1; }
+}
+
+need gh
+need fzf
+need jq
+
+get_cache_file() {
+    local query="$1"
+    local safe_query
+    safe_query=$(echo "$query" | tr -cd '[:alnum:]_-' | head -c 50)
+    echo "$CACHE_DIR/cache_${safe_query}.tsv"
+}
+
+is_cache_valid() {
+    local cache_file="$1"
+    [[ -f "$cache_file" ]] || return 1
+    local now old age
+    now=$(date +%s)
+    old=$(stat -c %Y "$cache_file" 2>/dev/null || echo 0)
+    age=$((now - old))
+    [[ $age -lt $CACHE_TTL ]]
+}
+
+do_search() {
+    local query="$1"
+    local cache_file
+    cache_file=$(get_cache_file "$query")
+
+    if is_cache_valid "$cache_file"; then
+        echo -e "${GREEN}[+] Using cache (still fresh)${NC}" >&2
+        cat "$cache_file"
+        return
+    fi
+
+    echo -e "${YELLOW}[*] Fetching fresh data from GitHub...${NC}" >&2
+
+    gh search repos "$query" \
+        --limit 1000 \
+        --sort stars \
+        --json fullName,stargazersCount,description,updatedAt,url,language,forksCount,openIssuesCount \
+        --jq '
+          .[] |
+          [
+            .fullName,
+            (.stargazersCount|tostring) + "★",
+            (.description // "No description" | gsub("[|\\n\\r\\t]"; " ")),
+            .updatedAt,
+            .url,
+            (.language // "N/A"),
+            (.forksCount // 0),
+            (.openIssuesCount // 0)
+          ] | @tsv
+        ' > "$cache_file"
+
+    cat "$cache_file"
+}
+
+banner
+
+if [[ "${1:-}" == "refresh" ]]; then
+    shift
+    QUERY="${1:-}"
+    if [[ -z "$QUERY" ]]; then
+        read -rp "Enter keyword to refresh: " QUERY
+    fi
+    cache_file=$(get_cache_file "$QUERY")
+    rm -f "$cache_file"
+    echo -e "${YELLOW}[+] Cache cleared. Fetching new data...${NC}" >&2
+fi
+
+QUERY="${1:-}"
+if [[ -z "$QUERY" ]]; then
+    read -rp "Enter keyword or CVE: " QUERY
+fi
+
+echo -e "${YELLOW}[*] Searching PoC for: ${QUERY}${NC}" >&2
+echo -e "${GRAY}────────────────────────────────────────────────────────────────────────${NC}" >&2
+
+results=$(do_search "$QUERY")
+
+if [[ -z "$results" ]]; then
+    echo -e "${RED}No results found for: $QUERY${NC}"
+    exit 0
+fi
+
+selected=$(echo "$results" | fzf \
+    --height=100% \
+    --layout=reverse \
+    --border \
+    --info=inline \
+    --delimiter=$'\t' \
+    --with-nth=1,2 \
+    --prompt="PoC > " \
+    --header="↑↓ Navigate | ENTER = Detail | ESC = Exit" \
+    --preview '
+        repo=$(echo {} | cut -f1)
+        stars=$(echo {} | cut -f2)
+        desc=$(echo {} | cut -f3)
+        updated=$(echo {} | cut -f4)
+        url=$(echo {} | cut -f5)
+        lang=$(echo {} | cut -f6)
+        forks=$(echo {} | cut -f7)
+        issues=$(echo {} | cut -f8)
+
+        echo -e "\033[1;36m$repo\033[0m   \033[33m$stars\033[0m"
+        echo -e "\033[38;5;245mLanguage: $lang   |   Forks: $forks   |   Open Issues: $issues\033[0m"
+        echo
+        echo -e "\033[38;5;51mDescription:\033[0m"
+        echo -e "\033[2m$desc\033[0m"
+        echo
+        echo -e "\033[38;5;245mUpdated: $updated\033[0m"
+        echo -e "\033[38;5;245mURL: $url\033[0m"
+        echo
+        echo -e "\033[38;5;51mREADME Preview:\033[0m"
+        echo
+
+        gh api "repos/$repo/readme" --jq ".content" 2>/dev/null | \
+            base64 -d 2>/dev/null | head -n 20 || echo "README tidak tersedia"
+    ' \
+    --preview-window=right:58%:wrap
+)
+
+[[ -z "$selected" ]] && exit 0
+
+repo=$(echo "$selected" | cut -f1)
+stars=$(echo "$selected" | cut -f2)
+desc=$(echo "$selected" | cut -f3)
+updated=$(echo "$selected" | cut -f4)
+url=$(echo "$selected" | cut -f5)
+
+clear
+
+echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════╗"
+echo "║                            PoC DETAIL VIEW                                 ║"
+echo -e "╚════════════════════════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${GREEN}Repository :${NC} $repo"
+echo -e "${GREEN}Stars      :${NC} $stars"
+echo -e "${GREEN}Updated    :${NC} $updated"
+echo -e "${GREEN}URL        :${NC} $url"
+echo
+echo -e "${YELLOW}Description:${NC}"
+echo -e "${GRAY}$desc${NC}"
+echo
+echo -e "${CYAN}────────────────────────────────────────────────────────────────────────────${NC}"
+echo -e "${YELLOW}README:${NC}"
+echo
+
+gh repo view "$repo" 2>/dev/null || echo "README not available"
+
+echo
+echo -e "${CYAN}────────────────────────────────────────────────────────────────────────────${NC}"
+echo
+echo -e "${GREEN}[1]${NC} Open in Browser    ${GREEN}[2]${NC} Clone Repository    ${RED}[q]${NC} Exit"
+read -rp "Choose: " opt
+
+case "$opt" in
+    1) gh repo view --web "$repo" ;;
+    2) gh repo clone "$repo" ;;
+    *) echo -e "${GRAY}Done.${NC}" ;;
+esac
