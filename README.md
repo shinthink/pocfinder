@@ -63,10 +63,10 @@ git clone https://github.com/shinthink/pocfinder.git
 cd pocfinder
 
 # Make the script executable
-chmod +x pocfinder
+chmod +x pocf
 
 # Run PoCFinder
-\./pocfinderinder
+./pocfinder
 ```
 
 ---
@@ -77,26 +77,26 @@ chmod +x pocfinder
 
 ```bash
 # Run in interactive mode
-\./pocfinderinder
+./pocfinder
 
 # Search directly with keyword or CVE
-\./pocfinderinder CVE-2024
-\./pocfinderinder sqlmap
-\./pocfinderinder "remote code execution"
+./pocfinder CVE-2024
+./pocfinder sqlmap
+./pocfinder "remote code execution"
 ```
 
 ### Available Commands
 
 | Command                        | Description                              |
 |--------------------------------|------------------------------------------|
-| `\./pocfinderinder`                       | Run interactive mode                     |
-| `\./pocfinderinder <keyword>`             | Search directly                          |
-| `\./pocfinderinder refresh`               | Clear cache and fetch fresh data         |
-| `\./pocfinderinder refresh <keyword>`     | Refresh cache for specific keyword       |
+| `./pocfinder`                       | Run interactive mode                     |
+| `./pocfinder <keyword>`             | Search directly                          |
+| `./pocfinder refresh`               | Clear cache and fetch fresh data         |
+| `./pocfinder refresh <keyword>`     | Refresh cache for specific keyword       |
 
 ### How to Use
 
-1. Run `\./pocfinderinder`
+1. Run `./pocfinder`
 2. Enter a keyword or CVE ID
 3. Use arrow keys (`↑` `↓`) to browse results
 4. View detailed information and README preview on the **right panel**
@@ -133,7 +133,7 @@ pocfinder/
 
 - A valid `GH_TOKEN` is required for the best experience
 - Cached results are valid for 10 minutes
-- Use `\./pocfinderinder refresh` to force update the cache
+- Use `./pocfinder refresh` to force update the cache
 
 ---
 
