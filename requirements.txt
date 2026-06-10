@@ -1,0 +1,12 @@
+# ==============================================
+# PoCFinder - System Dependencies
+# ==============================================
+# This project is written in Bash.
+# The following tools are required to run PoCFinder.
+
+gh          # GitHub CLI (required)
+fzf         # Fuzzy finder for interactive selection (required)
+jq          # JSON processor (required)
+
+# Optional but recommended:
+# - A valid GitHub Personal Access Token (GH_TOKEN)
