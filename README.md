@@ -13,43 +13,72 @@ It provides a clean `fzf`-based interface with rich preview, automatic caching, 
 ## ✨ Features
 
 - 🔍 Search PoCs by keyword or CVE ID
-- ⚡ **Automatic caching** system (results are saved for 10 minutes)
+- ⚡ **Automatic caching** system (results saved for 10 minutes)
 - 🖥️ Rich live preview panel (Description, Language, Forks, Open Issues, README Preview)
 - 🎨 Modern terminal UI inspired by popular security tools
 - 🚀 Built on top of GitHub CLI (`gh`) for fast and reliable results
-- 📋 Quick actions to open repository in browser or clone it
+- 📋 Quick actions: Open in browser or clone repository
 
 ---
 
 ## 📦 Requirements
 
-Before using PoCFinder, install the following dependencies:
-
 ### Required Tools
 
-| Tool | Purpose                          | Ubuntu / Debian          | Fedora / RHEL            | macOS (Homebrew)      |
-|------|----------------------------------|--------------------------|--------------------------|-----------------------|
-| `gh` | GitHub Command Line Interface    | `apt install gh`         | `dnf install gh`         | `brew install gh`     |
-| `fzf`| Interactive fuzzy finder         | `apt install fzf`        | `dnf install fzf`        | `brew install fzf`    |
-| `jq` | JSON processor                   | `apt install jq`         | `dnf install jq`         | `brew install jq`     |
+| Tool | Purpose                              | Minimum Version     | Installation |
+|------|--------------------------------------|---------------------|--------------|
+| `gh` | GitHub Command Line Interface        | **2.20.0 or higher** | See below    |
+| `fzf`| Interactive fuzzy finder             | Any                 | See below    |
+| `jq` | JSON processor                       | Any                 | See below    |
 
-> **Note**: `brew` (Homebrew) is popular on **macOS**. On Linux, it is recommended to use your distribution’s package manager (`apt`, `dnf`, `pacman`, etc.).
+> **Important**: `gh` version **2.20.0 or newer** is required because PoCFinder uses the `gh search repos` command.
+
+### How to Install Dependencies
+
+#### Ubuntu / Debian (Recommended)
+
+```bash
+# Add GitHub CLI official repository
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
+sudo apt update
+sudo apt install gh fzf jq -y
+```
+
+#### Fedora / Rocky Linux / AlmaLinux
+
+```bash
+sudo dnf install gh fzf jq -y
+```
+
+#### Arch Linux / Manjaro
+
+```bash
+sudo pacman -S github-cli fzf jq
+```
+
+#### macOS (using Homebrew)
+
+```bash
+brew install gh fzf jq
+```
 
 ### GitHub Personal Access Token
 
-PoCFinder requires a GitHub token to avoid rate limiting.
+You need to set a GitHub Personal Access Token:
 
 ```bash
 export GH_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-**Recommended**: Add this line to your shell configuration file:
+Add it to your shell configuration file:
 
 ```bash
-# Bash
+# For Bash
 echo 'export GH_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx' >> ~/.bashrc
 
-# Zsh
+# For Zsh
 echo 'export GH_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx' >> ~/.zshrc
 ```
 
@@ -58,14 +87,9 @@ echo 'export GH_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx' >> ~/.zshrc
 ## 🚀 Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/shinthink/pocfinder.git
 cd pocfinder
-
-# Make the script executable
-chmod +x pocfinder
-
-# Run PoCFinder
+chmod +x pocf
 ./pocfinder
 ```
 
@@ -73,38 +97,28 @@ chmod +x pocfinder
 
 ## 📖 Usage
 
-### Basic Commands
-
 ```bash
-# Run in interactive mode
+# Interactive mode
 ./pocfinder
 
-# Search directly with keyword or CVE
+# Search directly
 ./pocfinder CVE-2024
 ./pocfinder sqlmap
 ./pocfinder "remote code execution"
+
+# Refresh cache
+./pocfinder refresh
+./pocfinder refresh CVE-2025
 ```
-
-### Available Commands
-
-| Command                        | Description                              |
-|--------------------------------|------------------------------------------|
-| `./pocfinder`                       | Run interactive mode                     |
-| `./pocfinder <keyword>`             | Search directly                          |
-| `./pocfinder refresh`               | Clear cache and fetch fresh data         |
-| `./pocfinder refresh <keyword>`     | Refresh cache for specific keyword       |
 
 ### How to Use
 
 1. Run `./pocfinder`
 2. Enter a keyword or CVE ID
-3. Use arrow keys (`↑` `↓`) to browse results
+3. Use arrow keys to browse results
 4. View detailed information and README preview on the **right panel**
-5. Press `Enter` to select a result
-6. Choose an action:
-   - `[1]` Open in Browser
-   - `[2]` Clone Repository
-   - `[q]` Exit
+5. Press `Enter` to select a repository
+6. Choose an action (`[1]` Open in Browser, `[2]` Clone, or `[q]` Exit)
 
 ---
 
@@ -112,7 +126,7 @@ chmod +x pocfinder
 
 ```
 pocfinder/
-├── pocfinder          # Main script
+├── pocfinder
 ├── README.md
 ├── LICENSE
 └── .gitattributes
@@ -125,21 +139,21 @@ pocfinder/
 - Uses `gh search repos` to find relevant repositories
 - Results are cached locally in `~/.pocfinder/`
 - Uses `fzf` for fast interactive selection
-- Displays rich information and a short README preview without leaving the terminal
+- Displays repository details and a short README preview
 
 ---
 
 ## 📌 Notes
 
-- A valid `GH_TOKEN` is required for the best experience
-- Cached results are valid for 10 minutes
+- `gh` version **2.20.0 or higher** is required
+- A valid `GH_TOKEN` is needed for the best experience
 - Use `./pocfinder refresh` to force update the cache
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests.
+Contributions are welcome!
 
 ---
 
