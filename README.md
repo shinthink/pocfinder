@@ -89,7 +89,7 @@ echo 'export GH_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx' >> ~/.zshrc
 ```bash
 git clone https://github.com/shinthink/pocfinder.git
 cd pocfinder
-chmod +x pocf
+chmod +x pocfinder
 ./pocfinder
 ```
 
