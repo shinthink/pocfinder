@@ -63,7 +63,7 @@ git clone https://github.com/shinthink/pocfinder.git
 cd pocfinder
 
 # Make the script executable
-chmod +x pocf
+chmod +x pocfinder
 
 # Run PoCFinder
 ./pocfinder
