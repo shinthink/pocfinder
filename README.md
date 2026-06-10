@@ -112,6 +112,8 @@ chmod +x pocfinder
 ```
 
 ### How to Use
+<img width="590" height="287" alt="image" src="https://github.com/user-attachments/assets/92f69da0-cdfe-43ed-913f-a82631128273" />
+<img width="1101" height="586" alt="image" src="https://github.com/user-attachments/assets/d88d77d0-72df-43c6-be1b-11f7f13d664b" />
 
 1. Run `./pocfinder`
 2. Enter a keyword or CVE ID
