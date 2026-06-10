@@ -112,7 +112,7 @@ chmod +x pocfinder
 
 ```
 pocfinder/
-├── pocf          # Main script
+├── pocfinder          # Main script
 ├── README.md
 ├── LICENSE
 └── .gitattributes
